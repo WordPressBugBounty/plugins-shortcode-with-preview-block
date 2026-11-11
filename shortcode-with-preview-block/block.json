@@ -1,15 +1,22 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "shortcode-preview/shortcode-preview",
-	"title": "Shortcode Preview",
+	"title": "Shortcode with Preview",
 	"category": "widgets",
 	"icon": "shortcode",
-	"description": "Shows preview of any shortcode on editor side. It renders shortcode in the editor side so editor does not need to visit front side to check how it will look on frontside.",
+	"description": "Shows a preview of any shortcode in the editor. It renders the shortcode on the editor side so you do not need to view the front end to see the result.",
 	"keywords": [ "shortcode", "render", "preview" ],
+	"textdomain": "shortcode-with-preview-block",
 	"attributes": {
 		"shortcodeText": {
-			"type": "string"
+			"type": "string",
+			"default": ""
 		}
 	},
-    "editorStyle": "assets/css/block-style.css",
-    "editorScript": "block.build.js"
+	"supports": {
+		"html": false
+	},
+	"editorScript": "file:./block.build.js",
+	"editorStyle": "file:./assets/css/block-style.css"
 }

@@ -1,66 +1,59 @@
 <?php
-
 /**
- * Plugin name: Shortcode Preview Block
+ * Plugin Name: Shortcode Preview Block
+ * Plugin URI: https://wordpress.org/plugins/shortcode-with-preview-block/
+ * Description: Shows a preview of any shortcode in the editor. It renders the shortcode on the editor side so you do not need to view the front end to see the result.
+ * Version: 1.1.0
+ * Requires at least: 6.3
+ * Requires PHP: 7.2
  * Author: Ronak Ganatra
- * Description: Normal WordPress gutenberg block do not show How the shortcode will output frontside, so we have created a similar gutenberg block which can preview the shortcode result on editor side.
- * version: 1.0.0
+ * Author URI: https://profiles.wordpress.org/ronakganatra/
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: shortcode-with-preview-block
+ *
+ * @package Shortcode_Preview_Block
  */
 
-add_action('enqueue_block_editor_assets', 'swp_rnk_add_block_editor_assets');
-
-/**
- * Enqueue block script.
- */
-function swp_rnk_add_block_editor_assets()
-{
-	wp_enqueue_script(
-		'swp-rnk-gutenberg-block',
-		plugin_dir_url(__FILE__) . 'block.build.js',
-		['wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor', 'wp-components', 'wp-dom-ready']
-	);
-	wp_enqueue_style(
-		'swp-rnk-gutenberg-block-css',
-		plugin_dir_url(__FILE__).'assets/css/block-style.css'
-	);
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-add_action('init', 'swp_rnk_init_callback');
+add_action( 'init', 'swp_rnk_init_callback' );
 
 /**
- * Runs on the initialization to register block.
+ * Register the dynamic shortcode preview block.
  */
-function swp_rnk_init_callback()
-{
-
-	/**
-	 * Register block type
-	 */
+function swp_rnk_init_callback() {
 	register_block_type(
-		'shortcode-preview/shortcode-preview',
-		[
-			'attributes'      => [
-				'shortcodeText' => [
-					'type'    => 'string',
-					'default' => '',
-				],
-			],
-			'editor_style' => 'swp-rnk-gutenberg-block-css',
-			'render_callback' => 'swp_rnk_shortcode_preview_callback'
-		]
+		__DIR__ . '/block.json',
+		array(
+			'render_callback' => 'swp_rnk_shortcode_preview_callback',
+		)
 	);
 }
 
-function swp_rnk_shortcode_preview_callback($atts)
-{
-	ob_start();
-?>
-	<div class="swp-rnk-preview">
-		<?php
-		echo ! empty( $atts['shortcodeText'] ) ? do_shortcode( $atts['shortcodeText'] ) : '';
-		?>
-	</div>
-<?php
-	$html = ob_get_clean();
-	return $html;
+/**
+ * Render the shortcode on the front end and in the editor preview.
+ *
+ * @param array $atts Block attributes.
+ * @return string
+ */
+function swp_rnk_shortcode_preview_callback( $atts ) {
+	$shortcode = isset( $atts['shortcodeText'] ) ? $atts['shortcodeText'] : '';
+	$output    = '';
+
+	if ( '' !== $shortcode ) {
+		$output = do_shortcode( $shortcode );
+	}
+
+	return sprintf(
+		'<div %s>%s</div>',
+		get_block_wrapper_attributes(
+			array(
+				'class' => 'swp-rnk-preview',
+			)
+		),
+		$output
+	);
 }
